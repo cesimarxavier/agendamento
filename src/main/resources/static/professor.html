@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Painel do Professor - Agendamentos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        gh: { canvas: '#f6f8fa', border: '#d0d7de', text: '#24292f', muted: '#57606a', link: '#0969da' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gh-canvas text-gh-text p-8">
+    <div class="max-w-6xl mx-auto">
+        <header class="border-b border-gh-border pb-4 mb-8 flex justify-between items-center">
+            <h1 class="text-xl font-semibold">Visão Docente: Agendamentos de Alunos</h1>
+            <nav class="space-x-4 text-sm text-gh-link">
+                <a href="/" class="hover:underline">Interface do Aluno</a>
+            </nav>
+        </header>
+
+        <div class="bg-white border border-gh-border rounded-md shadow-sm overflow-hidden">
+            <div class="bg-gh-canvas border-b border-gh-border px-4 py-3 font-medium text-sm">
+                Solicitações Pendentes e Confirmadas
+            </div>
+            <table class="w-full text-left text-sm border-collapse">
+                <thead>
+                    <tr class="bg-gray-50 border-b border-gh-border text-gh-muted font-medium">
+                        <th class="px-4 py-2">ID</th>
+                        <th class="px-4 py-2">Estudante</th>
+                        <th class="px-4 py-2">Matrícula</th>
+                        <th class="px-4 py-2">Assunto</th>
+                        <th class="px-4 py-2">Data e Hora</th>
+                        <th class="px-4 py-2">Status</th>
+                    </tr>
+                </thead>
+                <tbody id="lista-professor">
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script src="app.js"></script>
+    <script>document.addEventListener('DOMContentLoaded', carregarListaProfessor);</script>
+</body>
+
+</html>

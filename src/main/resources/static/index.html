@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Listagem de Agendamentos</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Helvetica', 'Arial', 'sans-serif'],
+                    },
+                    colors: {
+                        gh: { canvas: '#f6f8fa', border: '#d0d7de', text: '#24292f', muted: '#57606a', link: '#0969da', green: '#2ea44f', danger: '#cf222e' }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+
+<body class="bg-gh-canvas text-gh-text font-sans antialiased p-6">
+
+    <div class="max-w-5xl mx-auto">
+        <div class="flex justify-between items-center border-b border-gh-border pb-4 mb-6">
+            <h1 class="text-2xl font-normal tracking-tight">Agendamentos</h1>
+            <button onclick="abrirModal()"
+                class="bg-gh-green text-white px-3 py-1.5 text-sm font-medium rounded-md border border-black/10 hover:bg-[#2c974b] transition-colors">
+                Novo agendamento
+            </button>
+        </div>
+
+        <div class="bg-white border border-gh-border rounded-md overflow-hidden shadow-sm">
+            <div class="bg-gh-canvas border-b border-gh-border px-4 py-3 font-semibold text-sm flex justify-between">
+                <span>Registros do Sistema</span>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="w-full text-left border-collapse text-sm">
+                    <thead>
+                        <tr class="border-b border-gh-border text-gh-muted">
+                            <th class="px-4 py-2 font-semibold">ID</th>
+                            <th class="px-4 py-2 font-semibold">Nome do Aluno</th>
+                            <th class="px-4 py-2 font-semibold">Data/Hora</th>
+                            <th class="px-4 py-2 font-semibold">Assunto</th>
+                            <th class="px-4 py-2 font-semibold">Status</th>
+                            <th class="px-4 py-2 font-semibold text-right">Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabela-corpo">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-overlay" class="fixed inset-0 bg-black/50 hidden flex items-center justify-center z-50">
+        <div class="w-full max-w-2xl bg-white border border-gh-border rounded-md p-6 shadow-lg relative">
+            <button onclick="fecharModal()" class="absolute top-4 right-4 text-gh-muted hover:text-gh-text">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12">
+                    </path>
+                </svg>
+            </button>
+            <h2 class="text-lg font-semibold mb-4 border-b border-gh-border pb-2">Solicitar Novo Agendamento</h2>
+
+            <form id="form-agendamento" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-1">Nome Completo</label>
+                    <input type="text" id="nomeAluno"
+                        class="w-full border border-gh-border rounded-md px-3 py-1.5 text-sm focus:border-gh-link outline-none"
+                        required>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-1">Matrícula</label>
+                    <input type="text" id="matricula"
+                        class="w-full border border-gh-border rounded-md px-3 py-1.5 text-sm focus:border-gh-link outline-none"
+                        required>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Assunto</label>
+                        <select id="assunto"
+                            class="w-full border border-gh-border rounded-md px-3 py-1.5 text-sm focus:border-gh-link outline-none">
+                            <option value="DUVIDA_AULA">Dúvida em Aula</option>
+                            <option value="REVISAO_PROVA">Revisão de Prova</option>
+                            <option value="ORIENTACAO_PROJETO">Orientação de Projeto</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-1">Data e Hora</label>
+                        <input type="datetime-local" id="dataHora"
+                            class="w-full border border-gh-border rounded-md px-3 py-1.5 text-sm focus:border-gh-link outline-none"
+                            required>
+                    </div>
+                </div>
+                <button type="submit"
+                    class="bg-gh-green text-white px-4 py-2 rounded-md text-sm font-semibold hover:opacity-90 w-full transition-opacity">
+                    Confirmar Solicitação
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+
+</html>
