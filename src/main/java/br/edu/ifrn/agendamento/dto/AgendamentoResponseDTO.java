@@ -1,34 +1,33 @@
 package br.edu.ifrn.agendamento.dto;
 
-import br.edu.ifrn.agendamento.model.StatusAgendamento;
-import br.edu.ifrn.agendamento.model.TipoAssunto;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class AgendamentoResponseDTO {
 
     private Long id;
     private String nomeAluno;
-    private String matricula;
+    private String matriculaAluno;
     private LocalDateTime dataHora;
-    private TipoAssunto assunto;
-    private StatusAgendamento status;
+    private String status;
+    private List<String> nomesCategorias;
 
-    // Métodos Getters e Setters omitidos para brevidade (devem ser gerados na IDE)
+    
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
+
     public String getNomeAluno() { return nomeAluno; }
     public void setNomeAluno(String nomeAluno) { this.nomeAluno = nomeAluno; }
-    // todo: crie get and set para getMatricula
+
+    public String getMatriculaAluno() { return matriculaAluno; }
+    public void setMatriculaAluno(String matriculaAluno) { this.matriculaAluno = matriculaAluno; }
+
     public LocalDateTime getDataHora() { return dataHora; }
     public void setDataHora(LocalDateTime dataHora) { this.dataHora = dataHora; }
-    public TipoAssunto getAssunto() { return assunto; }
-    public void setAssunto(TipoAssunto assunto) { this.assunto = assunto; }
-    public StatusAgendamento getStatus() { return status; }
-    public void setStatus(StatusAgendamento status) { this.status = status; }
-    public String getMatricula() {
-        return matricula;
-    }
-    public void setMatricula(String matricula) {
-        this.matricula = matricula;
-    }
+
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+
+    public List<String> getNomesCategorias() { return nomesCategorias; }
+    public void setNomesCategorias(List<String> nomesCategorias) { this.nomesCategorias = nomesCategorias; }
 }

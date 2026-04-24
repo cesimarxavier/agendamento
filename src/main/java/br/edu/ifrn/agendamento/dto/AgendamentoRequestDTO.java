@@ -1,33 +1,30 @@
 package br.edu.ifrn.agendamento.dto;
 
-import br.edu.ifrn.agendamento.model.TipoAssunto;
-import jakarta.validation.constraints.Future;
-import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Future;
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class AgendamentoRequestDTO {
 
-    @NotBlank(message = "O nome do aluno é obrigatório.")
-    private String nomeAluno;
+    @NotNull(message = "O ID do aluno é obrigatório.")
+    private Long alunoId;
 
-    @NotBlank(message = "A matrícula é obrigatória.")
-    private String matricula;
+    @NotEmpty(message = "Pelo menos uma categoria deve ser selecionada.")
+    private List<Long> categoriasIds;
 
     @NotNull(message = "A data e hora são obrigatórias.")
-    @Future(message = "A data do agendamento deve ser no futuro.")
+    @Future(message = "A data deve ser no futuro.")
     private LocalDateTime dataHora;
 
-    @NotNull(message = "O assunto é obrigatório.")
-    private TipoAssunto assunto;
+    
+    public Long getAlunoId() { return alunoId; }
+    public void setAlunoId(Long alunoId) { this.alunoId = alunoId; }
 
-    // Métodos Getters e Setters omitidos para brevidade (devem ser gerados na IDE)
-    public String getNomeAluno() { return nomeAluno; }
-    public void setNomeAluno(String nomeAluno) { this.nomeAluno = nomeAluno; }
-    public String getMatricula() { return matricula; }
-    public void setMatricula(String matricula) { this.matricula = matricula; }
+    public List<Long> getCategoriasIds() { return categoriasIds; }
+    public void setCategoriasIds(List<Long> categoriasIds) { this.categoriasIds = categoriasIds; }
+
     public LocalDateTime getDataHora() { return dataHora; }
     public void setDataHora(LocalDateTime dataHora) { this.dataHora = dataHora; }
-    public TipoAssunto getAssunto() { return assunto; }
-    public void setAssunto(TipoAssunto assunto) { this.assunto = assunto; }
 }
