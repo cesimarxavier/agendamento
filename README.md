@@ -1,7 +1,20 @@
-### Justificativa do projeto
-O domínio "Sistema de Agendamento de Atendimento" foi escolhido por atender de forma direta e prática aos requisitos da disciplina:
+## Justificativa do projeto
+### Domínio da Aplicação
+O sistema implementado gerencia Agendamentos Acadêmicos, com foco em agendamento de horários de estudo ou orientação baseados em categorias específicas.
 
-1. Separação de Dados: A entidade Agendamento fica oculta. A comunicação ocorre apenas pelos objetos AgendamentoRequestDTO e AgendamentoResponseDTO. Os tipos de assunto e status utilizam Enums.
-2. Regra Condicional: O comportamento do sistema muda de acordo com o atributo "assunto". Solicitações para "Revisão de Prova", por exemplo, recebem um tempo de atendimento e prioridade diferentes de "Dúvida Geral". Falhas nessa regra acionam uma exceção customizada.
-3. Múltiplas Implementações: O sistema possui uma interface NotificacaoService com duas implementações (Email e SMS). A anotação @Qualifier é utilizada no controlador para definir qual delas será executada.
-4. Respostas e Persistência: Os dados são guardados em memória na camada de repositório. O controlador gerencia as requisições HTTP retornando os status exatos via ResponseEntity (200, 201 para sucesso; 400, 404 para erros).
+### Mapeamento Objeto-Relacional (JPA):
+A refatoração substituiu as estruturas em memória por entidades relacionais, estabelecendo os seguintes vínculos:
+
+**1. Relacionamento 1:N**: Implementado entre Aluno (1) e Agendamento (N). Um aluno pode possuir múltiplos agendamentos, sendo a chave estrangeira gerida na tabela de agendamentos.
+
+**2. Relacionamento N:N**: Implementado entre Agendamento (N) e Categoria (N). Um agendamento pode conter múltiplas categorias (ex: Dúvida, Revisão), gerando automaticamente a tabela associativa agendamento_categoria.
+
+
+### Arquitetura com diferentes Bancos de Dados:
+A aplicação foi configurada para operar com duas instâncias distintas do banco H2 em memória, garantindo a segregação de responsabilidades:
+
+**1. Base Principal**: Exclusiva para o armazenamento das entidades de domínio e regras de negócio.
+
+**2. Base de Auditoria**: Exclusiva para o registro de logs de operações (Criação e Exclusão).
+
+A integridade das operações simultâneas entre as duas bases é assegurada pelo controle transacional (@Transactional) na camada de Serviço. A comunicação com a API foi totalmente isolada utilizando o padrão DTO (Request/Response).
