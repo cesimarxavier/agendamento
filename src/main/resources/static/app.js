@@ -1,139 +1,118 @@
-document.addEventListener("DOMContentLoaded", () => {
-    if (document.getElementById('tabela-corpo')) {
-        carregarAgendamentos();
+const API_URL = 'http://localhost:8080/api/agendamentos';
+
+// Carregar agendamentos ao abrir a página
+document.addEventListener('DOMContentLoaded', carregarAgendamentos);
+
+// Lidar com o envio do formulário
+document.getElementById('agendamentoForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const mensagemDiv = document.getElementById('mensagem');
+    mensagemDiv.innerHTML = ''; // Limpar mensagens anteriores
+
+    // 1. Coletar o ID do Aluno (Convertido para Inteiro)
+    const alunoId = parseInt(document.getElementById('alunoId').value);
+
+    // 2. Coletar os IDs das Categorias marcadas (Convertidos para Inteiros)
+    const categoriasIds = Array.from(document.querySelectorAll('.categoria-checkbox:checked'))
+                               .map(cb => parseInt(cb.value));
+
+    // 3. Coletar a Data e Hora
+    const dataHora = document.getElementById('dataHora').value;
+
+    // Validação no frontend: garantir que escolheu pelo menos uma categoria
+    if (categoriasIds.length === 0) {
+        mostrarMensagem('Selecione pelo menos uma categoria.', 'danger');
+        return;
     }
-    if (document.getElementById('lista-professor')) {
-        carregarListaProfessor();
+
+    // Montar o objeto DTO
+    const requestDTO = {
+        alunoId: alunoId,
+        categoriasIds: categoriasIds,
+        dataHora: dataHora
+    };
+
+    try {
+        const response = await fetch(API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestDTO)
+        });
+
+        if (response.ok) {
+            mostrarMensagem('Agendamento criado com sucesso! (Salvo no BD Principal e log gerado na Auditoria)', 'success');
+            document.getElementById('agendamentoForm').reset();
+            carregarAgendamentos(); // Atualizar tabela
+        } else {
+            // Tentar capturar a mensagem de erro da nossa RegraNegocioException
+            const errorText = await response.text();
+            mostrarMensagem(`Erro ao criar: ${errorText || response.statusText}`, 'danger');
+        }
+    } catch (error) {
+        mostrarMensagem('Erro de conexão com o servidor.', 'danger');
+        console.error(error);
     }
 });
 
-// ==========================================
-// Controle do Modal
-// ==========================================
-function abrirModal() {
-    const modal = document.getElementById('modal-overlay');
-    if (modal) modal.classList.remove('hidden');
-}
-
-function fecharModal() {
-    const modal = document.getElementById('modal-overlay');
-    if (modal) modal.classList.add('hidden');
-    
-    const form = document.getElementById('form-agendamento');
-    if (form) form.reset();
-}
-
-// ==========================================
-// Processamento do Formulário (POST)
-// ==========================================
-const form = document.getElementById('form-agendamento');
-if (form) {
-    form.addEventListener('submit', async (e) => {
-        e.preventDefault();
+// Função para buscar e renderizar a tabela
+async function carregarAgendamentos() {
+    try {
+        const response = await fetch(API_URL);
+        const agendamentos = await response.json();
         
-        const payload = {
-            nomeAluno: document.getElementById('nomeAluno').value,
-            matricula: document.getElementById('matricula').value,
-            assunto: document.getElementById('assunto').value,
-            dataHora: document.getElementById('dataHora').value
-        };
+        const tbody = document.getElementById('tabelaCorpo');
+        tbody.innerHTML = '';
 
+        agendamentos.forEach(ag => {
+            const tr = document.createElement('tr');
+            
+            // Formatando a data para visualização PT-BR
+            const dataFormatada = new Date(ag.dataHora).toLocaleString('pt-BR');
+            
+            // Juntando as categorias com vírgula
+            const categoriasFormatadas = ag.nomesCategorias ? ag.nomesCategorias.join(', ') : '-';
+
+            tr.innerHTML = `
+                <td>${ag.id}</td>
+                <td><strong>${ag.nomeAluno}</strong></td>
+                <td>${ag.matriculaAluno}</td>
+                <td><span class="badge bg-secondary">${categoriasFormatadas}</span></td>
+                <td>${dataFormatada}</td>
+                <td><span class="badge bg-info text-dark">${ag.status}</span></td>
+                <td>
+                    <button class="btn btn-sm btn-danger" onclick="deletarAgendamento(${ag.id})">Excluir</button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    } catch (error) {
+        console.error("Erro ao carregar agendamentos:", error);
+    }
+}
+
+// Função para deletar agendamento
+async function deletarAgendamento(id) {
+    if (confirm('Tem certeza que deseja excluir este agendamento?')) {
         try {
-            const response = await fetch('/api/agendamentos', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(payload)
+            const response = await fetch(`${API_URL}/${id}`, {
+                method: 'DELETE'
             });
 
             if (response.ok) {
-                fecharModal();
-                carregarAgendamentos(); // Atualiza a tabela imediatamente após inserção
+                carregarAgendamentos();
             } else {
-                const erro = await response.json();
-                alert('Erro: ' + (erro.erro || 'Falha na validação dos dados.'));
+                alert('Erro ao excluir agendamento.');
             }
         } catch (error) {
-            console.error('Falha de rede:', error);
+            console.error("Erro ao deletar:", error);
         }
-    });
-}
-
-// ==========================================
-// Carga e Renderização (Visão Principal)
-// ==========================================
-function carregarAgendamentos() {
-    fetch('/api/agendamentos')
-        .then(response => response.json())
-        .then(dados => {
-            const tbody = document.getElementById('tabela-corpo');
-            if (!tbody) return;
-            
-            tbody.innerHTML = '';
-
-            dados.forEach(a => {
-                const tr = document.createElement('tr');
-                tr.className = 'border-b border-gh-border hover:bg-gray-50 transition-colors';
-
-                tr.innerHTML = `
-                    <td class="px-4 py-3 text-gh-muted">#${a.id}</td>
-                    <td class="px-4 py-3 font-medium text-gh-text">${a.nomeAluno}</td>
-                    <td class="px-4 py-3 text-gh-muted">${formatarData(a.dataHora)}</td>
-                    <td class="px-4 py-3">
-                        <span class="bg-gray-100 text-gh-muted border border-gray-200 px-2 py-0.5 rounded-full text-xs">${a.assunto}</span>
-                    </td>
-                    <td class="px-4 py-3">
-                        <span class="text-[#1a7f37] border border-[#a3dcaf] bg-[#e6ffec] px-2 py-0.5 rounded-full text-xs font-medium">${a.status}</span>
-                    </td>
-                    <td class="px-4 py-3 text-right">
-                        <button onclick="deletarAgendamento(${a.id})" class="text-gh-danger hover:underline cursor-pointer">Excluir</button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        })
-        .catch(erro => console.error('Falha na Carga dos dados:', erro));
-}
-
-// ==========================================
-// Carregameto e Renderização - Visão do professor
-// ==========================================
-async function carregarListaProfessor() {
-    try {
-        const res = await fetch('/api/agendamentos');
-        const dados = await res.json();
-        const corpo = document.getElementById('lista-professor');
-        if (!corpo) return;
-
-        corpo.innerHTML = dados.map(a => `
-            <tr class="border-b border-gh-border hover:bg-gray-50">
-                <td class="px-4 py-3 text-gh-muted">#${a.id}</td>
-                <td class="px-4 py-3 font-medium">${a.nomeAluno}</td>
-                <td class="px-4 py-3 text-xs">${a.matricula || 'N/A'}</td>
-                <td class="px-4 py-3"><span class="bg-gray-100 px-2 py-1 rounded border border-gh-border text-xs">${a.assunto}</span></td>
-                <td class="px-4 py-3 text-gh-muted">${formatarData(a.dataHora)}</td>
-                <td class="px-4 py-3"><span class="text-green-700 font-semibold">${a.status}</span></td>
-            </tr>
-        `).join('');
-    } catch (erro) {
-        console.error('Falha na Carga dos dados do professor:', erro);
     }
 }
 
-// ==========================================
-// Funções Utilitárias e Exclusão (DELETE)
-// ==========================================
-function formatarData(dataIso) {
-    if(!dataIso) return '-';
-    return new Date(dataIso).toLocaleString('pt-BR');
-}
-
-function deletarAgendamento(id) {
-    if(confirm('Confirma a exclusão deste agendamento?')) {
-        fetch(`/api/agendamentos/${id}`, { method: 'DELETE' })
-            .then(response => {
-                if(response.ok) {
-                    carregarAgendamentos();
-                }
-            });
-    }
+// Utilitário para exibir mensagens na tela
+function mostrarMensagem(texto, tipo) {
+    const mensagemDiv = document.getElementById('mensagem');
+    mensagemDiv.innerHTML = `<div class="alert alert-${tipo}" role="alert">${texto}</div>`;
 }
