@@ -1,45 +1,22 @@
 package br.edu.ifrn.agendamento.repository;
 
 import br.edu.ifrn.agendamento.model.Agendamento;
-import br.edu.ifrn.agendamento.model.TipoAssunto;
-import org.springframework.stereotype.Repository;
-
-import java.util.ArrayList;
-import java.util.HashMap;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
-@Repository
-public class AgendamentoRepository {
+public interface AgendamentoRepository extends JpaRepository<Agendamento, Long> {
 
-    private final Map<Long, Agendamento> dados = new HashMap<>();
-    private Long idCounter = 1L;
+    // usa a sintaxe orientada a objetos do Hibernate
+    @Query("SELECT a FROM Agendamento a WHERE a.status = :status")
+    List<Agendamento> buscarPorStatusJpql(@Param("status") String status);
 
-    public Agendamento salvar(Agendamento agendamento) {
-        if (agendamento.getId() == null) {
-            agendamento.setId(idCounter++);
-        }
-        dados.put(agendamento.getId(), agendamento);
-        return agendamento;
-    }
+    // Consulta Nativa: usa SQL do banco de dados relacional
+    @Query(value = "SELECT * FROM agendamento WHERE data_hora > CURRENT_TIMESTAMP", nativeQuery = true)
+    List<Agendamento> buscarAgendamentosFuturosNativo();
 
-    public List<Agendamento> findAll() {
-        return new ArrayList<>(dados.values());
-    }
-
-    public Optional<Agendamento> findById(Long id) {
-        return Optional.ofNullable(dados.get(id));
-    }
-
-    public List<Agendamento> buscarPorTipoAssunto(TipoAssunto assunto) {
-        return dados.values().stream()
-                .filter(a -> a.getAssunto() == assunto)
-                .collect(Collectors.toList());
-    }
-
-    public void deletar(Long id) {
-        dados.remove(id);
-    }
+    // realiza consulta EAGER (JOIN FETCH): Carrega os relacionamentos N:N na mesma transação para mitigar o problema N+1
+    @Query("SELECT a FROM Agendamento a JOIN FETCH a.categorias WHERE a.id = :id")
+    Agendamento buscarComCategoriasEager(@Param("id") Long id);
 }
