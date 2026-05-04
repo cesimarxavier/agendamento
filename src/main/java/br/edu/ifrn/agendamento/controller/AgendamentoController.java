@@ -1,46 +1,49 @@
 package br.edu.ifrn.agendamento.controller;
 
 import br.edu.ifrn.agendamento.dto.AgendamentoRequestDTO;
-import br.edu.ifrn.agendamento.dto.AgendamentoResponseDTO;
-import br.edu.ifrn.agendamento.service.AgendamentoService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
+import java.util.Map;
 
 @RestController
-@RequestMapping("/api/agendamentos")
+@RequestMapping("/api")
 public class AgendamentoController {
 
-    private final AgendamentoService service;
-
-    @Autowired
-    public AgendamentoController(AgendamentoService service) {
-        this.service = service;
+    
+    @GetMapping("/info")
+    public ResponseEntity<Map<String, String>> obterInfoSistema() {
+        return ResponseEntity.ok(Map.of("status", "Ativo", "versao", "1.1-SECURE"));
     }
 
-    @PostMapping
-    public ResponseEntity<AgendamentoResponseDTO> criar(@Valid @RequestBody AgendamentoRequestDTO dto) {
-        AgendamentoResponseDTO response = service.registrarAgendamento(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    
+    @GetMapping("/agendamentos")
+    @PreAuthorize("hasAnyRole('COORDENADOR', 'PROFESSOR', 'ALUNO')")
+    public ResponseEntity<?> listarAgendamentos() {
+        return ResponseEntity.ok().build();
     }
 
-    @GetMapping
-    public ResponseEntity<List<AgendamentoResponseDTO>> listarTodos() {
-        return ResponseEntity.ok(service.listarTodos());
+    
+    @PutMapping("/agendamentos/{id}")
+    @PreAuthorize("hasAnyRole('COORDENADOR', 'PROFESSOR')")
+    public ResponseEntity<?> atualizarAgendamento(@PathVariable Long id, @RequestBody @Valid AgendamentoRequestDTO dto) {
+        // Substituir pela lógica do Service. Lançar exceção (404 Not Found) se ID não existir[cite: 1]
+        return ResponseEntity.ok().build();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<AgendamentoResponseDTO> buscarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(service.buscarPorId(id));
+    
+    @PostMapping("/agendamentos")
+    @PreAuthorize("hasRole('COORDENADOR')")
+    public ResponseEntity<?> criarAgendamento(@RequestBody @Valid AgendamentoRequestDTO dto) {
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deletar(@PathVariable Long id) {
-        service.deletarAgendamento(id);
+    
+    @DeleteMapping("/agendamentos/{id}")
+    @PreAuthorize("hasRole('COORDENADOR')")
+    public ResponseEntity<Void> excluirAgendamento(@PathVariable Long id) {
         return ResponseEntity.noContent().build();
     }
 }
