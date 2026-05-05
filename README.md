@@ -1,20 +1,30 @@
-## Justificativa do projeto
-### Domínio da Aplicação
-O sistema implementado gerencia Agendamentos Acadêmicos, com foco em agendamento de horários de estudo ou orientação baseados em categorias específicas.
+# Sistema de Agendamento - Atividade 03  
 
-### Mapeamento Objeto-Relacional (JPA):
-A refatoração substituiu as estruturas em memória por entidades relacionais, estabelecendo os seguintes vínculos:
+## 1. Permissões
+A aplicação foi protegida utilizando Spring Security com base em 3 níveis hierárquicos:
 
-**1. Relacionamento 1:N**: Implementado entre Aluno (1) e Agendamento (N). Um aluno pode possuir múltiplos agendamentos, sendo a chave estrangeira gerida na tabela de agendamentos.
+| Endpoint                 | Método | Acesso Restrito a:                           | Retorno Esperado |
+| ------------------------ | ------ | -------------------------------------------- | ---------------- |
+| `/api/info`              | GET    | Público (PermitAll)                          | 200 OK           |
+| `/api/agendamentos`      | GET    | ROLE_COORDENADOR, ROLE_PROFESSOR, ROLE_ALUNO | 200 OK           |
+| `/api/agendamentos/{id}` | PUT    | ROLE_COORDENADOR, ROLE_PROFESSOR             | 200 OK / 404     |
+| `/api/agendamentos`      | POST   | ROLE_COORDENADOR                             | 201 Created      |
+| `/api/agendamentos/{id}` | DELETE | ROLE_COORDENADOR                             | 204 No Content   |
 
-**2. Relacionamento N:N**: Implementado entre Agendamento (N) e Categoria (N). Um agendamento pode conter múltiplas categorias (ex: Dúvida, Revisão), gerando automaticamente a tabela associativa agendamento_categoria.
+*Observação:* Tentativas de acesso a endpoints sem a Role necessária são interceptadas pelo SecurityFilterChain, retornando o status `403 Forbidden`.
 
+## 2. Desacoplamento
+O sistema demonstra desacoplamento total entre o banco de dados e a API.
 
-### Arquitetura com diferentes Bancos de Dados:
-A aplicação foi configurada para operar com duas instâncias distintas do banco H2 em memória, garantindo a segregação de responsabilidades:
+**Entidade:**
+A entidade `Agendamento` armazena referências diretas aos objetos `Aluno` e `Categoria`, além de dados internos de controle de persistência.
 
-**1. Base Principal**: Exclusiva para o armazenamento das entidades de domínio e regras de negócio.
-
-**2. Base de Auditoria**: Exclusiva para o registro de logs de operações (Criação e Exclusão).
-
-A integridade das operações simultâneas entre as duas bases é assegurada pelo controle transacional (@Transactional) na camada de Serviço. A comunicação com a API foi totalmente isolada utilizando o padrão DTO (Request/Response).
+**DTO de Entrada - Exemplo de Payload:**
+Utilizado no POST e PUT. Recebe apenas IDs de relacionamento e aplica validações estruturais (`@NotBlank`, `@Size`).
+```json
+{
+  "alunoId": 1,
+  "categoriasIds": [1, 2],
+  "motivo": "Revisão detalhada do conteúdo da unidade II.",
+  "dataHora": "2026-05-20T14:30:00"
+}
