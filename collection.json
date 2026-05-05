@@ -1,51 +1,81 @@
 {
-	"info": {
-		"name": "API Agendamento Secure (Atividade 03)",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-	},
-	"item": [
-		{
-			"name": "0. Info Pública",
-			"request": {
-				"method": "GET",
-				"url": "http://localhost:8080/api/info"
-			}
-		},
-		{
-			"name": "1. Criar Agendamento (Admin)",
-			"request": {
-				"auth": { "type": "basic", "basic": [ { "key": "password", "value": "123", "type": "string" }, { "key": "username", "value": "admin", "type": "string" } ] },
-				"method": "POST",
-				"header": [ { "key": "Content-Type", "value": "application/json" } ],
-				"body": { "mode": "raw", "raw": "{\n    \"alunoId\": 1,\n    \"categoriasIds\": [1, 3],\n    \"motivo\": \"Acompanhamento de TCC.\",\n    \"dataHora\": \"2026-05-20T14:30:00\"\n}" },
-				"url": "http://localhost:8080/api/agendamentos"
-			}
-		},
-		{
-			"name": "2. Listar Todos (Aluno)",
-			"request": {
-				"auth": { "type": "basic", "basic": [ { "key": "password", "value": "123", "type": "string" }, { "key": "username", "value": "aluno", "type": "string" } ] },
-				"method": "GET",
-				"url": "http://localhost:8080/api/agendamentos"
-			}
-		},
-		{
-			"name": "3. Atualizar (Professor)",
-			"request": {
-				"auth": { "type": "basic", "basic": [ { "key": "password", "value": "123", "type": "string" }, { "key": "username", "value": "prof", "type": "string" } ] },
-				"method": "PUT",
-				"header": [ { "key": "Content-Type", "value": "application/json" } ],
-				"body": { "mode": "raw", "raw": "{\n    \"alunoId\": 1,\n    \"categoriasIds\": [2],\n    \"motivo\": \"Nova revisão solicitada.\",\n    \"dataHora\": \"2026-05-21T10:00:00\"\n}" },
-				"url": "http://localhost:8080/api/agendamentos/1"
-			}
-		},
-		{
-			"name": "4. Excluir (Admin)",
-			"request": {
-				"auth": { "type": "basic", "basic": [ { "key": "password", "value": "123", "type": "string" }, { "key": "username", "value": "admin", "type": "string" } ] },
-				"method": "DELETE",
-				"url": "http://localhost:8080/api/agendamentos/1"
-			}
-		}
-	]
+  "info": {
+    "name": "API Agendamento Secure (Atividade 03)",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "0. Info Pública",
+      "request": {
+        "method": "GET",
+        "url": "http://localhost:8080/api/info"
+      }
+    },
+    {
+      "name": "1. Criar Agendamento (Admin)",
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            { "key": "password", "value": "123", "type": "string" },
+            { "key": "username", "value": "admin", "type": "string" }
+          ]
+        },
+        "method": "POST",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"alunoId\": 1,\n    \"categoriasIds\": [1, 3],\n    \"motivo\": \"Acompanhamento de TCC.\",\n    \"dataHora\": \"2026-05-20T14:30:00\"\n}"
+        },
+        "url": "http://localhost:8080/api/agendamentos"
+      }
+    },
+    {
+      "name": "2. Listar Todos (Aluno)",
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            { "key": "password", "value": "123", "type": "string" },
+            { "key": "username", "value": "aluno", "type": "string" }
+          ]
+        },
+        "method": "GET",
+        "url": "http://localhost:8080/api/agendamentos"
+      }
+    },
+    {
+      "name": "3. Atualizar (Professor)",
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            { "key": "password", "value": "123", "type": "string" },
+            { "key": "username", "value": "prof", "type": "string" }
+          ]
+        },
+        "method": "PUT",
+        "header": [ { "key": "Content-Type", "value": "application/json" } ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"alunoId\": 1,\n    \"categoriasIds\": [2],\n    \"motivo\": \"Nova revisão solicitada.\",\n    \"dataHora\": \"2026-05-21T10:00:00\"\n}"
+        },
+        "url": "http://localhost:8080/api/agendamentos/1"
+      }
+    },
+    {
+      "name": "4. Excluir (Admin)",
+      "request": {
+        "auth": {
+          "type": "basic",
+          "basic": [
+            { "key": "password", "value": "123", "type": "string" },
+            { "key": "username", "value": "admin", "type": "string" }
+          ]
+        },
+        "method": "DELETE",
+        "url": "http://localhost:8080/api/agendamentos/1"
+      }
+    }
+  ]
 }
