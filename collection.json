@@ -1,106 +1,51 @@
 {
 	"info": {
-		"name": "API Agendamento (Atividade 02)",
-		"description": "Rotas para gestão de agendamentos híbrida (Base Principal e Auditoria) com mapeamento relacional JPA.",
+		"name": "API Agendamento Secure (Atividade 03)",
 		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
 	},
 	"item": [
 		{
-			"name": "1. Criar Agendamento",
+			"name": "0. Info Pública",
 			"request": {
+				"method": "GET",
+				"url": "http://localhost:8080/api/info"
+			}
+		},
+		{
+			"name": "1. Criar Agendamento (Admin)",
+			"request": {
+				"auth": { "type": "basic", "basic": [ { "key": "password", "value": "123", "type": "string" }, { "key": "username", "value": "admin", "type": "string" } ] },
 				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json",
-						"type": "text"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"alunoId\": 1,\n    \"categoriasIds\": [1, 3],\n    \"dataHora\": \"2026-05-20T14:30:00\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
-				},
-				"url": {
-					"raw": "http://localhost:8080/api/agendamentos",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"api",
-						"agendamentos"
-					]
-				}
-			},
-			"response": []
+				"header": [ { "key": "Content-Type", "value": "application/json" } ],
+				"body": { "mode": "raw", "raw": "{\n    \"alunoId\": 1,\n    \"categoriasIds\": [1, 3],\n    \"motivo\": \"Acompanhamento de TCC.\",\n    \"dataHora\": \"2026-05-20T14:30:00\"\n}" },
+				"url": "http://localhost:8080/api/agendamentos"
+			}
 		},
 		{
-			"name": "2. Listar Todos",
+			"name": "2. Listar Todos (Aluno)",
 			"request": {
+				"auth": { "type": "basic", "basic": [ { "key": "password", "value": "123", "type": "string" }, { "key": "username", "value": "aluno", "type": "string" } ] },
 				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/api/agendamentos",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"api",
-						"agendamentos"
-					]
-				}
-			},
-			"response": []
+				"url": "http://localhost:8080/api/agendamentos"
+			}
 		},
 		{
-			"name": "3. Buscar por ID",
+			"name": "3. Atualizar (Professor)",
 			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/api/agendamentos/1",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"api",
-						"agendamentos",
-						"1"
-					]
-				}
-			},
-			"response": []
+				"auth": { "type": "basic", "basic": [ { "key": "password", "value": "123", "type": "string" }, { "key": "username", "value": "prof", "type": "string" } ] },
+				"method": "PUT",
+				"header": [ { "key": "Content-Type", "value": "application/json" } ],
+				"body": { "mode": "raw", "raw": "{\n    \"alunoId\": 1,\n    \"categoriasIds\": [2],\n    \"motivo\": \"Nova revisão solicitada.\",\n    \"dataHora\": \"2026-05-21T10:00:00\"\n}" },
+				"url": "http://localhost:8080/api/agendamentos/1"
+			}
 		},
 		{
-			"name": "4. Deletar Agendamento",
+			"name": "4. Excluir (Admin)",
 			"request": {
+				"auth": { "type": "basic", "basic": [ { "key": "password", "value": "123", "type": "string" }, { "key": "username", "value": "admin", "type": "string" } ] },
 				"method": "DELETE",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:8080/api/agendamentos/1",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "8080",
-					"path": [
-						"api",
-						"agendamentos",
-						"1"
-					]
-				}
-			},
-			"response": []
+				"url": "http://localhost:8080/api/agendamentos/1"
+			}
 		}
 	]
 }
