@@ -1,23 +1,33 @@
 package br.edu.ifrn.agendamento.config;
 
-import br.edu.ifrn.agendamento.model.Aluno;
-import br.edu.ifrn.agendamento.model.Categoria;
-import br.edu.ifrn.agendamento.repository.AlunoRepository;
-import br.edu.ifrn.agendamento.repository.CategoriaRepository;
+import java.util.Arrays;
+import java.util.List;
+
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.util.Arrays;
-import java.util.List;
+import br.edu.ifrn.agendamento.model.Aluno;
+import br.edu.ifrn.agendamento.model.Categoria;
+import br.edu.ifrn.agendamento.model.TipoRole;
+import br.edu.ifrn.agendamento.model.Usuario;
+import br.edu.ifrn.agendamento.repository.AlunoRepository;
+import br.edu.ifrn.agendamento.repository.CategoriaRepository;
+import br.edu.ifrn.agendamento.repository.UsuarioRepository;
 
 @Configuration
 public class DataLoader {
 
     @Bean
-    public CommandLineRunner carregarDados(AlunoRepository alunoRepo, CategoriaRepository catRepo) {
+    public CommandLineRunner carregarDados(
+            AlunoRepository alunoRepo, 
+            CategoriaRepository catRepo,
+            UsuarioRepository usuarioRepo,
+            PasswordEncoder passwordEncoder) {
+        
         return args -> {
-            // Garante a inserção apenas se a tabela estiver vazia
+            // 1. Inicialização de Alunos
             if (alunoRepo.count() == 0) {
                 List<Aluno> alunos = Arrays.asList(
                         criarAluno("Maria Silva", "202310140400"),
@@ -34,12 +44,33 @@ public class DataLoader {
                 alunoRepo.saveAll(alunos);
             }
 
+            // 2. Inicialização de Categorias
             if (catRepo.count() == 0) {
                 catRepo.saveAll(Arrays.asList(
                     new Categoria("DUVIDA_AULA"),       // ID 1
                     new Categoria("REVISAO_PROVA"),     // ID 2
                     new Categoria("ORIENTACAO_PROJETO") // ID 3
                 ));
+            }
+
+            // 3. Inicialização de Usuários e Autoridades de Segurança
+            if (usuarioRepo.count() == 0) {
+                Usuario coordenador = new Usuario();
+                coordenador.setUsername("admin");
+                coordenador.setPassword(passwordEncoder.encode("123"));
+                coordenador.setRole(TipoRole.ROLE_COORDENADOR);
+
+                Usuario professor = new Usuario();
+                professor.setUsername("prof");
+                professor.setPassword(passwordEncoder.encode("123"));
+                professor.setRole(TipoRole.ROLE_PROFESSOR);
+
+                Usuario aluno = new Usuario();
+                aluno.setUsername("aluno");
+                aluno.setPassword(passwordEncoder.encode("123"));
+                aluno.setRole(TipoRole.ROLE_ALUNO);
+
+                usuarioRepo.saveAll(Arrays.asList(coordenador, professor, aluno));
             }
         };
     }
